@@ -1,0 +1,48 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    container_name: my-rabbitmq
+    ports:
+      - 5672:5672 # Expose AMQP port
+      - 15672:15672 # Expose management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=Harsha_123
+    networks:
+      - mynetwork
+  #pika_consumer:
+  #build:
+  #context: .
+  #dockerfile: Dockerfile
+  #environment:
+  #- RABBITMQ_HOST=rabbitmq
+  #depends_on:
+  #- rabbitmq
+  gunicorn:
+    volumes:
+      - .:/code
+      - static:/code/static
+      - media:/code/media
+    build:
+      context: .
+    networks:
+      - mynetwork
+  web_site:
+    build: .
+    ports:
+      - 8001:8001
+    volumes:
+      - static:/code/static
+    networks:
+      - mynetwork
+
+volumes:
+  static:
+  media:
+  rabbitmq_data:
+
+networks:
+  mynetwork:
+    driver: bridge

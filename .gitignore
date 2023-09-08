@@ -1,0 +1,11 @@
+venv/
+db.sqlite3
+__pycache__/
+*/__pycache__/
+*/migrations/
+error.py
+erl_crash.dump
+data.py
+Checking
+common/middlewares/
+src/static/

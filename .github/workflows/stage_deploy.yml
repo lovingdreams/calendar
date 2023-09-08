@@ -1,0 +1,49 @@
+name: Worke Stage Calendar Backend CI
+
+on:
+  push:
+    branches: [stage]
+
+jobs:
+  build-stage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+  deploy-stage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: executing remote ssh commands using password
+
+        uses: appleboy/ssh-action@master
+
+        with:
+          host: ${{ secrets.SSH_STAGE_HOST }}
+
+          username: ${{ secrets.SSH_STAGE_USERNAME }}
+
+          password: ${{ secrets.SSH_STAGE_PASSWORD }}
+
+          port: ${{ secrets.SSH_STAGE_PORT }}
+
+          script: |
+
+            eval `ssh-agent -s`
+
+            ssh-add ~/.ssh/calendar
+
+            cd ~/worke_calendar_service
+
+            git pull -f origin stage
+
+            eval "$(/home/ubuntu/miniconda3/bin/conda shell.bash hook)"
+
+            conda deactivate
+
+            conda init bash
+
+            conda activate calendar
+
+            make run-stage

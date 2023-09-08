@@ -1,0 +1,49 @@
+name: Worke Demo Calendar Backend CI
+
+on:
+  push:
+    branches: [demo]
+
+jobs:
+  build-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+  deploy-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: executing remote ssh commands using password
+
+        uses: appleboy/ssh-action@master
+
+        with:
+          host: ${{ secrets.SSH_DEMO_HOST }}
+
+          username: ${{ secrets.SSH_DEMO_USERNAME }}
+
+          password: ${{ secrets.SSH_DEMO_PASSWORD }}
+
+          port: ${{ secrets.SSH_DEMO_PORT }}
+
+          script: |
+
+            eval `ssh-agent -s`
+
+            ssh-add ~/.ssh/calendar
+
+            cd ~/worke_calendar_service
+
+            git pull -f origin demo
+
+            eval "$(/home/ubuntu/miniconda3/bin/conda shell.bash hook)"
+
+            conda deactivate
+
+            conda init bash
+
+            conda activate calendar
+
+            make run-demo
